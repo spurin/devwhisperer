@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dev Whisperer (Local Dev Copilot)</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+      background-color: #f9f9f9;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      font-family: monospace;
+      font-size: 14px;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: #fff;
+    }
+    select, button {
+      margin-top: 1rem;
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 1rem;
+      white-space: pre-wrap;
+      border-left: 4px solid #ccc;
+      margin-top: 1.5rem;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧠 Dev Whisperer (Local Dev Copilot)</h1>
+
+  <label for="code"><strong>Paste your code:</strong></label><br />
+  <textarea id="code" placeholder="Type or paste your code here..."></textarea><br />
+
+  <label for="action"><strong>Select Action:</strong></label><br />
+  <select id="action">
+    <option value="explain">Explain</option>
+    <option value="suggest">Suggest Improvements</option>
+    <option value="refactor">Refactor</option>
+  </select><br />
+
+  <button onclick="askAI()">Run</button>
+
+  <h3>💬 Response:</h3>
+  <pre id="response">Waiting for input...</pre>
+
+  <script>
+    const MODEL_NAME = "${MODEL_NAME}";
+
+    async function askAI() {
+      const code = document.getElementById("code").value.trim();
+      const action = document.getElementById("action").value;
+      const responseBox = document.getElementById("response");
+
+      if (!code) {
+        responseBox.textContent = "⚠️ Please enter some code first.";
+        return;
+      }
+
+      let systemPrompt = "";
+      switch (action) {
+        case "explain":
+          systemPrompt = "You are a helpful programming assistant. Explain what the following code does:";
+          break;
+        case "suggest":
+          systemPrompt = "You are a code reviewer. Suggest improvements for the following code:";
+          break;
+        case "refactor":
+          systemPrompt = "You are an expert software engineer. Refactor the following code for readability and performance:";
+          break;
+      }
+
+      const payload = {
+        model: MODEL_NAME,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: code }
+        ]
+      };
+
+      responseBox.textContent = "🧠 Thinking...";
+
+      try {
+        const res = await fetch("/v1/chat/completions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+        responseBox.textContent = result.choices?.[0]?.message?.content || "🤖 No response from model.";
+      } catch (err) {
+        console.error(err);
+        responseBox.textContent = "❌ Error communicating with the model.";
+      }
+    }
+  </script>
+</body>
+</html>
