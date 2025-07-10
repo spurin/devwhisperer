@@ -34,22 +34,9 @@ git clone https://github.com/yourname/devwhisperer.git
 cd devwhisperer
 ```
 
-### 2. Pull a model
+Modify compose.yaml, if you wish to ue a different model
 
-```bash
-docker model pull ai/llama3.2:1B-Q8_0
-```
-
-### 3. Create a `.env` file
-
-```env
-MODEL_API_URL=http://model-runner.docker.internal:80/engines/llama.cpp/v1/
-MODEL_NAME=ai/llama3.2:1B-Q8_0
-```
-
-> 🔁 Replace these with the actual model you're using locally.
-
-### 3. Run the app
+### 2. Run the app
 
 ```bash
 docker compose up --build
